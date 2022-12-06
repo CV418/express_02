@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-undef */
 const database = require("./database");
 
 const users = [
@@ -54,7 +52,15 @@ const users = [
 ];
 
 const getUsers = (req, res) => {
-    res.json(users);
+  database
+  .query("SELECT * FROM users")
+  .then(([users]) => {
+    res.json(users)
+  })
+  .catch((err) => {
+    console.error(err);
+    res.status(500).send("Error")
+  });
 };
 
 const getUserById = (req, res) => {
@@ -71,7 +77,8 @@ const getUserById = (req, res) => {
     }
     )
     .catch((err) =>{
-        console.error(500).send("Error retrieving database");
+        console.error(err)
+        res.status(500).send("Error retrieving database");
     })
 
 };
@@ -88,8 +95,25 @@ const getUser = (req, res) => {
       });
   }
 
+  const postUsers = (req, res) => {
+    const { firstname, lastname, email, city, language } = req.body;
+    database
+    .query(
+      "INSERT INTO users(firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?)",
+      [firstname, lastname, email, city, language]
+    )
+    .then(([result]) =>{
+      res.location(`/api/users/${result.insertId}`).sendStatus(201);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send("Error saving users");
+    })
+  }
+
 module.exports = {
     getUsers,
     getUserById,
     getUser,
+    postUsers,
 };
