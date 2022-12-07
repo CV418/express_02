@@ -4,6 +4,8 @@ const port = process.env.APP_PORT ?? 8001;
 const app = express();
 app.use(express.json());
 
+const validateUsers = require("./validators.js")
+
 const welcome = (req, res) => {
     res.send("Welcome Users");
 };
@@ -14,7 +16,7 @@ const userHandlers = require("./userHandlers")
 
 app.get("/api/users", userHandlers.getUsers)
 app.get("/api/users/:id", userHandlers.getUserById)
-app.post("/api/users", userHandlers.postUsers)
+app.post("/api/users", validateUsers, userHandlers.postUsers)
 app.put("/api/users/:id", userHandlers.updateUsers)
 
 
